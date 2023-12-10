@@ -15,6 +15,11 @@ const books = [
 ];
 
 // Define your GraphQL schema
+
+// define type GetBooks which accepts title and author as string and returns the book type
+
+// define type Book which accepts id, title and author as string and returns the book type
+
 const schema = buildSchema(`
   type Book {
     id: ID!
@@ -25,6 +30,7 @@ const schema = buildSchema(`
   type Query {
     books: [Book]
     book(id: ID!): Book
+    getBooks(title: String, author: String): [Book]
   }
 
   input BookInput {
@@ -45,6 +51,19 @@ const root = {
     const newBook = { id: String(books.length + 1), ...input };
     books.push(newBook);
     return newBook;
+  },
+  getBooks: ({ title, author }) => {
+    let filteredBooks = books;
+
+    if (title) {
+      filteredBooks = filteredBooks.filter(book => book.title.includes(title));
+    }
+
+    if (author) {
+      filteredBooks = filteredBooks.filter(book => book.author.includes(author));
+    }
+
+    return filteredBooks;
   },
 };
 
