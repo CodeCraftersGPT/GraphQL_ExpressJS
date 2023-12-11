@@ -2,6 +2,11 @@ const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
 
+// enable cors for 3000 port localhost'
+const cors = require('cors');
+
+
+
 // Sample data
 const books = [
   { id: '1', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald' },
@@ -10,6 +15,11 @@ const books = [
 ];
 
 // Define your GraphQL schema
+
+// define type GetBooks which accepts title and author as string and returns the book type
+
+// define type Book which accepts id, title and author as string and returns the book type
+
 const schema = buildSchema(`
   type Book {
     id: ID!
@@ -20,6 +30,7 @@ const schema = buildSchema(`
   type Query {
     books: [Book]
     book(id: ID!): Book
+    getBooks(title: String, author: String): [Book]
   }
 
   input BookInput {
@@ -41,10 +52,25 @@ const root = {
     books.push(newBook);
     return newBook;
   },
+  getBooks: ({ title, author }) => {
+    let filteredBooks = books;
+
+    if (title) {
+      filteredBooks = filteredBooks.filter(book => book.title.includes(title));
+    }
+
+    if (author) {
+      filteredBooks = filteredBooks.filter(book => book.author.includes(author));
+    }
+
+    return filteredBooks;
+  },
 };
 
 // Create an Express server
 const app = express();
+
+app.use(cors());  
 
 // Create a route for GraphQL using express-graphql
 app.use('/graphql', graphqlHTTP({
